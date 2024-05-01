@@ -1,0 +1,26 @@
+#download and extract kafka
+tar -xzf kafka_2.13-3.7.0.tgz
+cd kafka_2.13-3.7.0
+
+#start the zookeeper service
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+#create a topic
+bin/kafka-topics.sh --create --topic quickstart-events --bootstrap-server localhost:9092
+bin/kafka-topics.sh --describe --topic quickstart-events --bootstrap-server localhost:9092
+
+#start the kafka broker service
+bin/kafka-server-start.sh config/server.properties
+
+#producer
+bin/kafka-console-producer.sh --topic quickstart-events --bootstrap-server localhost:9092
+#consumer
+bin/kafka-console-consumer.sh --topic quickstart-events --from-beginning --bootstrap-server localhost:9092
+
+#import data from a file
+echo "plugin.path=libs/connect-file-3.7.0.jar"
+echo -e "foo\nbar" > test.txt
+bin/connect-standalone.sh config/connect-standalone.properties config/connect-file-source.properties config/connect-file-sink.properties
+more test.sink.txt
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic connect-test --from-beginning
+echo Another line>> test.txt
